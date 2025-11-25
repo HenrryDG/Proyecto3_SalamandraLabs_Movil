@@ -44,9 +44,12 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           // Carnet
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.carnet = newValue!,
+            onChanged: (value) {
+              if (value.isNotEmpty) removeError(error: kCarnetNullError);
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kNamelNullError);
+                addError(error: kCarnetNullError);
                 return "";
               }
               return null;
@@ -75,6 +78,9 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           // Nombre
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.nombre = newValue!,
+            onChanged: (value) {
+              if (value.isNotEmpty) removeError(error: kNamelNullError);
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
                 addError(error: kNamelNullError);
@@ -95,6 +101,21 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           TextFormField(
             onSaved: (newValue) =>
                 widget.tempCliente.apellidoPaterno = newValue,
+            onChanged: (value) {
+              if (value.isNotEmpty ||
+                  (widget.tempCliente.apellidoMaterno?.isNotEmpty ?? false)) {
+                removeError(error: "Por favor ingrese al menos un apellido");
+              }
+            },
+            validator: (value) {
+              if ((value == null || value.isEmpty) &&
+                  (widget.tempCliente.apellidoMaterno == null ||
+                      widget.tempCliente.apellidoMaterno!.isEmpty)) {
+                addError(error: "Por favor ingrese al menos un apellido");
+                return "";
+              }
+              return null;
+            },
             decoration: const InputDecoration(
               labelText: "Apellido Paterno",
               hintText: "Ingresa tu apellido paterno",
@@ -108,6 +129,21 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           TextFormField(
             onSaved: (newValue) =>
                 widget.tempCliente.apellidoMaterno = newValue,
+            onChanged: (value) {
+              if (value.isNotEmpty ||
+                  (widget.tempCliente.apellidoPaterno?.isNotEmpty ?? false)) {
+                removeError(error: "Por favor ingrese al menos un apellido");
+              }
+            },
+            validator: (value) {
+              if ((value == null || value.isEmpty) &&
+                  (widget.tempCliente.apellidoPaterno == null ||
+                      widget.tempCliente.apellidoPaterno!.isEmpty)) {
+                addError(error: "Por favor ingrese al menos un apellido");
+                return "";
+              }
+              return null;
+            },
             decoration: const InputDecoration(
               labelText: "Apellido Materno",
               hintText: "Ingresa tu apellido materno",
@@ -120,9 +156,12 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           // Lugar de trabajo
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.lugarTrabajo = newValue!,
+            onChanged: (value) {
+              if (value.isNotEmpty) removeError(error: kLugarTrabajoNullError);
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kNamelNullError);
+                addError(error: kLugarTrabajoNullError);
                 return "";
               }
               return null;
@@ -139,9 +178,12 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           // Tipo de trabajo
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.tipoTrabajo = newValue!,
+            onChanged: (value) {
+              if (value.isNotEmpty) removeError(error: kTipoTrabajoNullError);
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kNamelNullError);
+                addError(error: kTipoTrabajoNullError);
                 return "";
               }
               return null;
@@ -160,9 +202,13 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             keyboardType: TextInputType.number,
             onSaved: (newValue) => widget.tempCliente.ingresoMensual =
                 double.tryParse(newValue ?? '0') ?? 0,
+            onChanged: (value) {
+              if (value.isNotEmpty)
+                removeError(error: kIngresoMensualNullError);
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kNamelNullError);
+                addError(error: kIngresoMensualNullError);
                 return "";
               }
               return null;
@@ -179,6 +225,9 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           // Dirección
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.direccion = newValue!,
+            onChanged: (value) {
+              if (value.isNotEmpty) removeError(error: kAddressNullError);
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
                 addError(error: kAddressNullError);
@@ -214,6 +263,9 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             keyboardType: TextInputType.phone,
             onSaved: (newValue) => widget.tempCliente.telefono =
                 int.tryParse(newValue ?? '0') ?? 0,
+            onChanged: (value) {
+              if (value.isNotEmpty) removeError(error: kPhoneNumberNullError);
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
                 addError(error: kPhoneNumberNullError);
@@ -262,8 +314,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                     const SnackBar(
                         content: Text('Cliente registrado con éxito')),
                   );
-
-                  // Aquí puedes navegar al login o home si quieres
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Error al registrar: $e')),

@@ -24,15 +24,22 @@ const defaultDuration = Duration(milliseconds: 250);
 // Form Error
 final RegExp emailValidatorRegExp =
     RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-const String kEmailNullError = "Please Enter your email";
-const String kInvalidEmailError = "Please Enter Valid Email";
+
+const String kEmailNullError = "Por favor ingrese su correo electrónico";
+const String kInvalidEmailError = "Por favor ingrese un correo electrónico válido";
 const String kUserNameNullError = "Por favor ingrese su nombre de usuario";
 const String kPassNullError = "Por favor ingrese su contraseña";
-const String kShortPassError = "Password is too short";
-const String kMatchPassError = "Passwords don't match";
-const String kNamelNullError = "Please Enter your name";
-const String kPhoneNumberNullError = "Please Enter your phone number";
-const String kAddressNullError = "Please Enter your address";
+const String kShortPassError = "La contraseña es muy corta";
+const String kMatchPassError = "Las contraseñas no coinciden";
+const String kNamelNullError = "Por favor ingrese su nombre";
+const String kPhoneNumberNullError = "Por favor ingrese su número de teléfono";
+const String kAddressNullError = "Por favor ingrese su dirección";
+
+// Nuevos errores para CompleteProfileForm
+const String kCarnetNullError = "Por favor ingrese su carnet";
+const String kLugarTrabajoNullError = "Por favor ingrese su lugar de trabajo";
+const String kTipoTrabajoNullError = "Por favor ingrese el tipo de trabajo";
+const String kIngresoMensualNullError = "Por favor ingrese su ingreso mensual";
 
 final otpInputDecoration = InputDecoration(
   contentPadding: const EdgeInsets.symmetric(vertical: 16),
