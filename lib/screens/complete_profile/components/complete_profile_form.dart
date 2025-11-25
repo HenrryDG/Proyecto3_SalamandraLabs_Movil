@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
 import '../../../constants.dart';
@@ -22,17 +23,13 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
+      setState(() => errors.add(error));
     }
   }
 
   void removeError({String? error}) {
     if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
+      setState(() => errors.remove(error));
     }
   }
 
@@ -42,17 +39,42 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       key: _formKey,
       child: Column(
         children: [
-          // Carnet
+          // =============================
+          // CARNET
+          // =============================
           TextFormField(
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(
+                (widget.tempCliente.complemento == null ||
+                        widget.tempCliente.complemento!.isEmpty)
+                    ? 8
+                    : 7,
+              ),
+            ],
             onSaved: (newValue) => widget.tempCliente.carnet = newValue!,
             onChanged: (value) {
               if (value.isNotEmpty) removeError(error: kCarnetNullError);
+              setState(
+                  () {}); // Para actualizar límite cuando cambia complemento
             },
             validator: (value) {
               if (value == null || value.isEmpty) {
                 addError(error: kCarnetNullError);
                 return "";
               }
+
+              final noComplemento = widget.tempCliente.complemento == null ||
+                  widget.tempCliente.complemento!.isEmpty;
+
+              const minLength = 5;
+              final maxLength = noComplemento ? 8 : 7;
+
+              if (value.length < minLength || value.length > maxLength) {
+                return "Debe tener entre $minLength y $maxLength dígitos";
+              }
+
               return null;
             },
             decoration: const InputDecoration(
@@ -64,24 +86,47 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Complemento (opcional)
+          // =============================
+          // COMPLEMENTO
+          // =============================
           TextFormField(
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^[0-9a-zA-Z]*$')),
+              LengthLimitingTextInputFormatter(2),
+            ],
+            onChanged: (value) {
+              setState(() {});
+            },
             onSaved: (newValue) => widget.tempCliente.complemento = newValue,
+            validator: (value) {
+              if (value != null && value.isNotEmpty) {
+                if (value.length != 2) {
+                  return "Debe tener exactamente 2 caracteres";
+                }
+                if (!RegExp(r'^[0-9][A-Za-z]$').hasMatch(value)) {
+                  return "Formato inválido (Ej: 1A)";
+                }
+              }
+              return null;
+            },
             decoration: const InputDecoration(
               labelText: "Complemento",
-              hintText: "Ingresa complemento (opcional)",
+              hintText: "Ej: 1A (opcional)",
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Carnet.svg"),
             ),
           ),
           const SizedBox(height: 20),
 
-          // Nombre
+          // =============================
+          // NOMBRE
+          // =============================
           TextFormField(
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ ]")),
+            ],
             onSaved: (newValue) => widget.tempCliente.nombre = newValue!,
-            onChanged: (value) {
-              if (value.isNotEmpty) removeError(error: kNamelNullError);
-            },
             validator: (value) {
               if (value == null || value.isEmpty) {
                 addError(error: kNamelNullError);
@@ -98,22 +143,21 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Apellido Paterno
+          // =============================
+          // APELLIDO PATERNO
+          // =============================
           TextFormField(
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ ]")),
+            ],
             onSaved: (newValue) =>
                 widget.tempCliente.apellidoPaterno = newValue,
-            onChanged: (value) {
-              if (value.isNotEmpty ||
-                  (widget.tempCliente.apellidoMaterno?.isNotEmpty ?? false)) {
-                removeError(error: "Por favor ingrese al menos un apellido");
-              }
-            },
             validator: (value) {
+              final apM = widget.tempCliente.apellidoMaterno;
               if ((value == null || value.isEmpty) &&
-                  (widget.tempCliente.apellidoMaterno == null ||
-                      widget.tempCliente.apellidoMaterno!.isEmpty)) {
-                addError(error: "Por favor ingrese al menos un apellido");
-                return "";
+                  (apM == null || apM.isEmpty)) {
+                return "Debe ingresar al menos un apellido";
               }
               return null;
             },
@@ -126,22 +170,21 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Apellido Materno
+          // =============================
+          // APELLIDO MATERNO
+          // =============================
           TextFormField(
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ ]")),
+            ],
             onSaved: (newValue) =>
                 widget.tempCliente.apellidoMaterno = newValue,
-            onChanged: (value) {
-              if (value.isNotEmpty ||
-                  (widget.tempCliente.apellidoPaterno?.isNotEmpty ?? false)) {
-                removeError(error: "Por favor ingrese al menos un apellido");
-              }
-            },
             validator: (value) {
+              final apP = widget.tempCliente.apellidoPaterno;
               if ((value == null || value.isEmpty) &&
-                  (widget.tempCliente.apellidoPaterno == null ||
-                      widget.tempCliente.apellidoPaterno!.isEmpty)) {
-                addError(error: "Por favor ingrese al menos un apellido");
-                return "";
+                  (apP == null || apP.isEmpty)) {
+                return "Debe ingresar al menos un apellido";
               }
               return null;
             },
@@ -154,16 +197,14 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Lugar de trabajo
+          // =============================
+          // LUGAR DE TRABAJO
+          // =============================
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.lugarTrabajo = newValue!,
-            onChanged: (value) {
-              if (value.isNotEmpty) removeError(error: kLugarTrabajoNullError);
-            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kLugarTrabajoNullError);
-                return "";
+                return kLugarTrabajoNullError;
               }
               return null;
             },
@@ -177,16 +218,14 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Tipo de trabajo
+          // =============================
+          // TIPO DE TRABAJO
+          // =============================
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.tipoTrabajo = newValue!,
-            onChanged: (value) {
-              if (value.isNotEmpty) removeError(error: kTipoTrabajoNullError);
-            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kTipoTrabajoNullError);
-                return "";
+                return kTipoTrabajoNullError;
               }
               return null;
             },
@@ -200,19 +239,19 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Ingreso mensual
+          // =============================
+          // INGRESO MENSUAL
+          // =============================
           TextFormField(
             keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
+            ],
             onSaved: (newValue) => widget.tempCliente.ingresoMensual =
-                double.tryParse(newValue ?? '0') ?? 0,
-            onChanged: (value) {
-              if (value.isNotEmpty)
-                removeError(error: kIngresoMensualNullError);
-            },
+                double.tryParse(newValue ?? "0") ?? 0,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kIngresoMensualNullError);
-                return "";
+                return kIngresoMensualNullError;
               }
               return null;
             },
@@ -226,16 +265,14 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Dirección
+          // =============================
+          // DIRECCIÓN
+          // =============================
           TextFormField(
             onSaved: (newValue) => widget.tempCliente.direccion = newValue!,
-            onChanged: (value) {
-              if (value.isNotEmpty) removeError(error: kAddressNullError);
-            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kAddressNullError);
-                return "";
+                return kAddressNullError;
               }
               return null;
             },
@@ -249,10 +286,20 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Correo (opcional)
+          // =============================
+          // CORREO (OPCIONAL)
+          // =============================
           TextFormField(
             keyboardType: TextInputType.emailAddress,
             onSaved: (newValue) => widget.tempCliente.correo = newValue,
+            validator: (value) {
+              if (value != null && value.isNotEmpty) {
+                if (!emailValidatorRegExp.hasMatch(value)) {
+                  return "Correo inválido";
+                }
+              }
+              return null;
+            },
             decoration: const InputDecoration(
               labelText: "Correo",
               hintText: "Ingresa tu correo (opcional)",
@@ -262,19 +309,30 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ),
           const SizedBox(height: 20),
 
-          // Teléfono
+          // =============================
+          // TELÉFONO
+          // =============================
           TextFormField(
-            keyboardType: TextInputType.phone,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(8),
+            ],
             onSaved: (newValue) => widget.tempCliente.telefono =
-                int.tryParse(newValue ?? '0') ?? 0,
-            onChanged: (value) {
-              if (value.isNotEmpty) removeError(error: kPhoneNumberNullError);
-            },
+                int.tryParse(newValue ?? "0") ?? 0,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                addError(error: kPhoneNumberNullError);
-                return "";
+                return kPhoneNumberNullError;
               }
+
+              if (value.length != 8) {
+                return "Debe tener exactamente 8 dígitos";
+              }
+
+              if (!value.startsWith("6") && !value.startsWith("7")) {
+                return "Debe iniciar con 6 o 7";
+              }
+
               return null;
             },
             decoration: const InputDecoration(
@@ -290,8 +348,9 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           FormError(errors: errors),
           const SizedBox(height: 20),
 
-          // Botón Registrar
-          // Botón Registrar
+          // =============================
+          // BOTÓN REGISTRAR
+          // =============================
           ElevatedButton(
             onPressed: isLoading
                 ? null
@@ -299,9 +358,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
 
-                      setState(() {
-                        isLoading = true;
-                      });
+                      setState(() => isLoading = true);
 
                       try {
                         await ApiService().registrarCliente(
@@ -322,7 +379,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                           password: widget.tempCliente.password!,
                         );
 
-                        // Redirigir a pantalla de éxito
                         if (context.mounted) {
                           Navigator.pushReplacementNamed(
                               context, "/register_success");
@@ -330,14 +386,12 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error al registrar: $e')),
+                            SnackBar(content: Text("Error al registrar: $e")),
                           );
                         }
                       } finally {
                         if (mounted) {
-                          setState(() {
-                            isLoading = false;
-                          });
+                          setState(() => isLoading = false);
                         }
                       }
                     }
@@ -347,8 +401,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
                       color: Colors.white,
+                      strokeWidth: 2,
                     ),
                   )
                 : const Text("Registrarse"),
