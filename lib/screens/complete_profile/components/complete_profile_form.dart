@@ -18,6 +18,7 @@ class CompleteProfileForm extends StatefulWidget {
 class _CompleteProfileFormState extends State<CompleteProfileForm> {
   final _formKey = GlobalKey<FormState>();
   final List<String?> errors = [];
+  bool isLoading = false;
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
@@ -170,7 +171,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               labelText: "Lugar de trabajo",
               hintText: "Ingresa tu lugar de trabajo",
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Briefcase.svg"),
+              suffixIcon:
+                  CustomSurffixIcon(svgIcon: "assets/icons/Briefcase.svg"),
             ),
           ),
           const SizedBox(height: 20),
@@ -192,7 +194,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               labelText: "Tipo de trabajo",
               hintText: "Ingresa tipo de trabajo",
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Employee.svg"),
+              suffixIcon:
+                  CustomSurffixIcon(svgIcon: "assets/icons/Employee.svg"),
             ),
           ),
           const SizedBox(height: 20),
@@ -217,7 +220,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               labelText: "Ingreso Mensual",
               hintText: "Ingresa tu ingreso mensual",
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Money_3.svg"),
+              suffixIcon:
+                  CustomSurffixIcon(svgIcon: "assets/icons/Money_3.svg"),
             ),
           ),
           const SizedBox(height: 20),
@@ -277,7 +281,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               labelText: "Número de Teléfono",
               hintText: "Ingresa tu número de teléfono",
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Cellphone.svg"),
+              suffixIcon:
+                  CustomSurffixIcon(svgIcon: "assets/icons/Cellphone.svg"),
             ),
           ),
           const SizedBox(height: 20),
@@ -286,42 +291,67 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           const SizedBox(height: 20),
 
           // Botón Registrar
+          // Botón Registrar
           ElevatedButton(
-            onPressed: () async {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
+            onPressed: isLoading
+                ? null
+                : () async {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
 
-                try {
-                  await ApiService().registrarCliente(
-                    cliente: Cliente(
-                      carnet: widget.tempCliente.carnet!,
-                      complemento: widget.tempCliente.complemento,
-                      nombre: widget.tempCliente.nombre!,
-                      apellidoPaterno: widget.tempCliente.apellidoPaterno,
-                      apellidoMaterno: widget.tempCliente.apellidoMaterno,
-                      lugarTrabajo: widget.tempCliente.lugarTrabajo!,
-                      tipoTrabajo: widget.tempCliente.tipoTrabajo!,
-                      ingresoMensual: widget.tempCliente.ingresoMensual!,
-                      direccion: widget.tempCliente.direccion!,
-                      correo: widget.tempCliente.correo,
-                      telefono: widget.tempCliente.telefono!,
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      try {
+                        await ApiService().registrarCliente(
+                          cliente: Cliente(
+                            carnet: widget.tempCliente.carnet!,
+                            complemento: widget.tempCliente.complemento,
+                            nombre: widget.tempCliente.nombre!,
+                            apellidoPaterno: widget.tempCliente.apellidoPaterno,
+                            apellidoMaterno: widget.tempCliente.apellidoMaterno,
+                            lugarTrabajo: widget.tempCliente.lugarTrabajo!,
+                            tipoTrabajo: widget.tempCliente.tipoTrabajo!,
+                            ingresoMensual: widget.tempCliente.ingresoMensual!,
+                            direccion: widget.tempCliente.direccion!,
+                            correo: widget.tempCliente.correo,
+                            telefono: widget.tempCliente.telefono!,
+                          ),
+                          username: widget.tempCliente.username!,
+                          password: widget.tempCliente.password!,
+                        );
+
+                        // Redirigir a pantalla de éxito
+                        if (context.mounted) {
+                          Navigator.pushReplacementNamed(
+                              context, "/register_success");
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error al registrar: $e')),
+                          );
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      }
+                    }
+                  },
+            child: isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
                     ),
-                    username: widget.tempCliente.username!,
-                    password: widget.tempCliente.password!,
-                  );
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Cliente registrado con éxito')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error al registrar: $e')),
-                  );
-                }
-              }
-            },
-            child: const Text("Registrarse"),
+                  )
+                : const Text("Registrarse"),
           ),
         ],
       ),
