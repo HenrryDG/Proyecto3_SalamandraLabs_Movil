@@ -58,8 +58,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               return null;
             },
             decoration: const InputDecoration(
-              labelText: "First Name",
-              hintText: "Enter your first name",
+              labelText: "Nombre",
+              hintText: "Ingresa tu nombre",
               // If  you are using latest version of flutter then lable text and hint text shown like this
               // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -70,8 +70,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           TextFormField(
             onSaved: (newValue) => lastName = newValue,
             decoration: const InputDecoration(
-              labelText: "Last Name",
-              hintText: "Enter your last name",
+              labelText: "Apellido Paterno",
+              hintText: "Ingresa tu apellido paterno",
               // If  you are using latest version of flutter then lable text and hint text shown like this
               // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -96,8 +96,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               return null;
             },
             decoration: const InputDecoration(
-              labelText: "Phone Number",
-              hintText: "Enter your phone number",
+              labelText: "Número de Teléfono",
+              hintText: "Ingresa tu número de teléfono",
               // If  you are using latest version of flutter then lable text and hint text shown like this
               // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -121,8 +121,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               return null;
             },
             decoration: const InputDecoration(
-              labelText: "Address",
-              hintText: "Enter your address",
+              labelText: "Dirección",
+              hintText: "Ingresa tu dirección",
               // If  you are using latest version of flutter then lable text and hint text shown like this
               // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -138,7 +138,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                 Navigator.pushNamed(context, OtpScreen.routeName);
               }
             },
-            child: const Text("Continue"),
+            child: const Text("Continuar"),
           ),
         ],
       ),
