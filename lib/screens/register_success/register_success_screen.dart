@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
 
-class LoginSuccessScreen extends StatelessWidget {
-  static String routeName = "/login_success";
+class RegisterSuccessScreen extends StatelessWidget {
+  static String routeName = "/register_success";
 
-  const LoginSuccessScreen({super.key});
+  const RegisterSuccessScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +20,7 @@ class LoginSuccessScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            "Login Success",
+            "Registrado Correctamente",
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,

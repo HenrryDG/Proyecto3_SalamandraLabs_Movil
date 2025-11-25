@@ -5,6 +5,8 @@ import '../../../components/form_error.dart';
 import '../../../constants.dart';
 import '../../complete_profile/complete_profile_screen.dart';
 
+import '../../../models/temp_cliente.dart';
+
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
 
@@ -14,9 +16,9 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
-  String? email;
+  String? username;
   String? password;
-  String? conform_password;
+  String? confirmPassword;
   bool remember = false;
   final List<String?> errors = [];
 
@@ -43,22 +45,17 @@ class _SignUpFormState extends State<SignUpForm> {
       child: Column(
         children: [
           TextFormField(
-            keyboardType: TextInputType.emailAddress,
-            onSaved: (newValue) => email = newValue,
+            keyboardType: TextInputType.text,
+            onSaved: (newValue) => username = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
-                removeError(error: kEmailNullError);
-              } else if (emailValidatorRegExp.hasMatch(value)) {
-                removeError(error: kInvalidEmailError);
+                removeError(error: kUserNameNullError);
               }
               return;
             },
             validator: (value) {
               if (value!.isEmpty) {
-                addError(error: kEmailNullError);
-                return "";
-              } else if (!emailValidatorRegExp.hasMatch(value)) {
-                addError(error: kInvalidEmailError);
+                addError(error: kUserNameNullError);
                 return "";
               }
               return null;
@@ -69,7 +66,7 @@ class _SignUpFormState extends State<SignUpForm> {
               // If  you are using latest version of flutter then lable text and hint text shown like this
               // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
+              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
             ),
           ),
           const SizedBox(height: 20),
@@ -106,14 +103,14 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 20),
           TextFormField(
             obscureText: true,
-            onSaved: (newValue) => conform_password = newValue,
+            onSaved: (newValue) => confirmPassword = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
                 removeError(error: kPassNullError);
-              } else if (value.isNotEmpty && password == conform_password) {
+              } else if (value.isNotEmpty && password == confirmPassword) {
                 removeError(error: kMatchPassError);
               }
-              conform_password = value;
+              confirmPassword = value;
             },
             validator: (value) {
               if (value!.isEmpty) {
@@ -140,11 +137,20 @@ class _SignUpFormState extends State<SignUpForm> {
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                // if all are valid then go to success screen
-                Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+
+                // Guardamos en TempCliente
+                final tempCliente = TempCliente();
+                tempCliente.username = username;
+                tempCliente.password = password;
+
+                Navigator.pushNamed(
+                  context,
+                  CompleteProfileScreen.routeName,
+                  arguments: tempCliente,
+                );
               }
             },
-            child: const Text("Continue"),
+            child: const Text("Continuar"),
           ),
         ],
       ),

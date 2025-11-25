@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import 'components/complete_profile_form.dart';
+import '../../models/temp_cliente.dart';
 
 class CompleteProfileScreen extends StatelessWidget {
   static String routeName = "/complete_profile";
 
   const CompleteProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
+    // Recibimos la instancia de TempCliente desde SignUpForm
+    final tempCliente = ModalRoute.of(context)!.settings.arguments as TempCliente;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Up'),
+        title: const Text('Regístrate'),
       ),
       body: SafeArea(
         child: SizedBox(
@@ -28,7 +33,8 @@ class CompleteProfileScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
-                  const CompleteProfileForm(),
+                  // Pasamos tempCliente al formulario
+                  CompleteProfileForm(tempCliente: tempCliente),
                   const SizedBox(height: 30),
                   Text(
                     "Al continuar confirmas que estás de acuerdo \ncon nuestros Términos y Condiciones",

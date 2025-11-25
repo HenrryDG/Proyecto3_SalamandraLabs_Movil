@@ -4,7 +4,9 @@ import '../models/cliente.dart';
 
 class ApiService {
   // URL base de tu API (ajusta según tu IP/host)
-  final String baseUrl = 'http://192.168.0.15:8000/api/clientes/';
+  // final String baseUrl = 'http://192.168.0.15:8000/api/clientes/';
+
+  final String baseUrl = 'https://api-esetel.vercel.app/api/clientes/';
 
   /// Registrar cliente (POST)
   /// Recibe un objeto Cliente y los campos username y password
