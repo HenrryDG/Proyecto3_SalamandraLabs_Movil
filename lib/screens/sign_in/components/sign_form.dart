@@ -5,6 +5,7 @@ import '../../../components/form_error.dart';
 import '../../../constants.dart';
 import '../../../helper/keyboard.dart';
 import '../../login_success/login_success_screen.dart';
+import '../../../services/api_service.dart';
 
 class SignForm extends StatefulWidget {
   const SignForm({super.key});
@@ -15,9 +16,11 @@ class SignForm extends StatefulWidget {
 
 class _SignFormState extends State<SignForm> {
   final _formKey = GlobalKey<FormState>();
-  String? email;
+  String? username;
   String? password;
   bool? remember = false;
+  bool isLoading = false;
+
   final List<String?> errors = [];
 
   void addError({String? error}) {
@@ -43,22 +46,16 @@ class _SignFormState extends State<SignForm> {
       child: Column(
         children: [
           TextFormField(
-            keyboardType: TextInputType.emailAddress,
-            onSaved: (newValue) => email = newValue,
+            keyboardType: TextInputType.text,
+            onSaved: (newValue) => username = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
-                removeError(error: kEmailNullError);
-              } else if (emailValidatorRegExp.hasMatch(value)) {
-                removeError(error: kInvalidEmailError);
+                removeError(error: kUserNameNullError);
               }
-              return;
             },
             validator: (value) {
               if (value!.isEmpty) {
-                addError(error: kEmailNullError);
-                return "";
-              } else if (!emailValidatorRegExp.hasMatch(value)) {
-                addError(error: kInvalidEmailError);
+                addError(error: kUserNameNullError);
                 return "";
               }
               return null;
@@ -66,8 +63,6 @@ class _SignFormState extends State<SignForm> {
             decoration: const InputDecoration(
               labelText: "Usuario",
               hintText: "Ingrese su usuario",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Email.svg"),
             ),
@@ -82,40 +77,54 @@ class _SignFormState extends State<SignForm> {
               } else if (value.length >= 8) {
                 removeError(error: kShortPassError);
               }
-              return;
             },
             validator: (value) {
               if (value!.isEmpty) {
                 addError(error: kPassNullError);
                 return "";
-              } else if (value.length < 8) {
-                addError(error: kShortPassError);
-                return "";
-              }
+              } 
+              
               return null;
             },
             decoration: const InputDecoration(
               labelText: "Contraseña",
               hintText: "Ingrese su contraseña",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
             ),
           ),
-          const SizedBox(height: 20),          
+          const SizedBox(height: 20),
           FormError(errors: errors),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-                // if all are valid then go to success screen
-                KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, LoginSuccessScreen.routeName);
-              }
-            },
-            child: const Text("Ingresar"),
+            onPressed: isLoading
+                ? null
+                : () async {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      KeyboardUtil.hideKeyboard(context);
+
+                      setState(() => isLoading = true);
+
+                      final api = ApiService();
+                      bool success = await api.login(
+                        username: username!,
+                        password: password!,
+                      );
+
+                      setState(() => isLoading = false);
+
+                      if (success) {
+                        Navigator.pushNamed(
+                            context, LoginSuccessScreen.routeName);
+                      } else {
+                        addError(error: "Usuario o contraseña incorrectos");
+                      }
+                    }
+                  },
+            child: isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text("Ingresar"),
           ),
         ],
       ),

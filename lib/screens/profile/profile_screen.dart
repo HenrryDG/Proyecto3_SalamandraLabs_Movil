@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'components/profile_menu.dart';
 import 'components/profile_pic.dart';
+import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
   static String routeName = "/profile";
@@ -42,7 +44,18 @@ class ProfileScreen extends StatelessWidget {
             ProfileMenu(
               text: "Log Out",
               icon: "assets/icons/Log out.svg",
-              press: () {},
+              press: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove("access");
+                await prefs.remove("refresh");
+
+                // Navegar directamente al login y borrar historial
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  SignInScreen.routeName,
+                  (route) => false,
+                );
+              },
             ),
           ],
         ),
