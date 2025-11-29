@@ -32,7 +32,11 @@ class LoginSuccessScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, InitScreen.routeName);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  InitScreen.routeName,
+                  (route) => false,
+                );
               },
               child: const Text("Ir al inicio"),
             ),
