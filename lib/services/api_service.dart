@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/cliente.dart';
 import '../models/solicitud.dart';
+import '../models/prestamo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
@@ -152,6 +153,68 @@ class ApiService {
       return true; // login OK
     } else {
       return false; // credenciales incorrectas
+    }
+  }
+
+  /// Obtener los préstamos del cliente autenticado (GET)
+  Future<List<Prestamo>> obtenerPrestamosCliente() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    // Primero obtenemos el perfil para obtener el ID del cliente
+    final cliente = await obtenerPerfil();
+
+    if (cliente.id == null) {
+      throw Exception('No se pudo obtener el ID del cliente');
+    }
+
+    final response = await http.get(
+      Uri.parse('${baseUrlSolicitudes}${cliente.id}/prestamos/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Prestamo.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener préstamos: ${response.body}');
+    }
+  }
+
+  /// Obtener el plan de pagos de un préstamo específico (GET)
+  Future<List<PlanPago>> obtenerPlanPagos(int prestamoId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          'https://api-esetel.vercel.app/api/prestamos/$prestamoId/plan-pagos/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => PlanPago.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener plan de pagos: ${response.body}');
     }
   }
 }
