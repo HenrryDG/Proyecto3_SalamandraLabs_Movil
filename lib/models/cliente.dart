@@ -1,5 +1,6 @@
 class Cliente {
   final int? id;
+  final String? user;
   final String carnet;
   final String? complemento;
   final String nombre;
@@ -17,6 +18,7 @@ class Cliente {
 
   Cliente({
     this.id,
+    this.user,
     required this.carnet,
     this.complemento,
     required this.nombre,
@@ -36,6 +38,7 @@ class Cliente {
   factory Cliente.fromJson(Map<String, dynamic> json) {
     return Cliente(
       id: json['id'],
+      user: json['user'],
       carnet: json['carnet'],
       complemento: json['complemento'],
       nombre: json['nombre'],
@@ -43,7 +46,9 @@ class Cliente {
       apellidoMaterno: json['apellido_materno'],
       lugarTrabajo: json['lugar_trabajo'],
       tipoTrabajo: json['tipo_trabajo'],
-      ingresoMensual: (json['ingreso_mensual'] as num).toDouble(),
+      ingresoMensual: json['ingreso_mensual'] is num
+          ? (json['ingreso_mensual'] as num).toDouble()
+          : double.parse(json['ingreso_mensual'].toString()),
       direccion: json['direccion'],
       correo: json['correo'],
       telefono: json['telefono'] is int
@@ -70,7 +75,7 @@ class Cliente {
       'telefono': telefono,
       'activo': activo,
     };
-    if (username != null) data['username'] = username;
+    if (user != null) data['user'] = user;
     if (password != null) data['password'] = password;
     return data;
   }
