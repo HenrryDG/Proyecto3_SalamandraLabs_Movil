@@ -19,6 +19,8 @@ import 'screens/splash/splash_screen.dart';
 import 'package:shop_app/screens/sign_in/auth_wrapper.dart';
 import 'screens/solicitudes/solicitudes_screen.dart';
 import 'screens/solicitudes/solicitud_detalle_screen.dart';
+import 'screens/prestamos/prestamos_screen.dart';
+import 'screens/prestamos/plan_pagos_screen.dart';
 
 // We use name route
 // al final de tus imports
@@ -49,4 +51,8 @@ final Map<String, WidgetBuilder> routes = {
       const AuthGuard(child: SolicitudesScreen()),
   SolicitudDetalleScreen.routeName: (context) =>
       const AuthGuard(child: SolicitudDetalleScreen()),
+  PrestamosScreen.routeName: (context) =>
+      const AuthGuard(child: PrestamosScreen()),
+  PlanPagosScreen.routeName: (context) =>
+      const AuthGuard(child: PlanPagosScreen()),
 };
