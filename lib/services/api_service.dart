@@ -9,6 +9,35 @@ class ApiService {
 
   final String baseUrl = 'https://api-esetel.vercel.app/api/clientes/';
   final String baseUrlLogin = 'https://api-esetel.vercel.app/api/login/';
+  final String baseUrlPerfil =
+      'https://api-esetel.vercel.app/api/clientes/perfil/';
+
+  /// Obtener el perfil del cliente autenticado (GET)
+  Future<Cliente> obtenerPerfil() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    final response = await http.get(
+      Uri.parse(baseUrlPerfil),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return Cliente.fromJson(data);
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener perfil: ${response.body}');
+    }
+  }
 
   /// Registrar cliente (POST)
   /// Recibe un objeto Cliente y los campos username y password
