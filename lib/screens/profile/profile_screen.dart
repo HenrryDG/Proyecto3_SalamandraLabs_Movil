@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'components/profile_menu.dart';
 import 'components/profile_pic.dart';
 import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
+import 'package:shop_app/screens/account/account_info_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -13,7 +14,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        title: const Text("Perfil"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -22,27 +23,29 @@ class ProfileScreen extends StatelessWidget {
             const ProfilePic(),
             const SizedBox(height: 20),
             ProfileMenu(
-              text: "My Account",
+              text: "Mi Cuenta",
               icon: "assets/icons/User Icon.svg",
-              press: () => {},
+              press: () {
+                Navigator.pushNamed(context, AccountInfoScreen.routeName);
+              },
             ),
             ProfileMenu(
-              text: "Notifications",
+              text: "Notificaciones",
               icon: "assets/icons/Bell.svg",
               press: () {},
             ),
             ProfileMenu(
-              text: "Settings",
+              text: "Configuración",
               icon: "assets/icons/Settings.svg",
               press: () {},
             ),
             ProfileMenu(
-              text: "Help Center",
+              text: "Centro de Ayuda",
               icon: "assets/icons/Question mark.svg",
               press: () {},
             ),
             ProfileMenu(
-              text: "Log Out",
+              text: "Cerrar Sesión",
               icon: "assets/icons/Log out.svg",
               press: () async {
                 final prefs = await SharedPreferences.getInstance();
