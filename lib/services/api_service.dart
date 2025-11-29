@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/cliente.dart';
+import '../models/solicitud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
@@ -11,6 +12,8 @@ class ApiService {
   final String baseUrlLogin = 'https://api-esetel.vercel.app/api/login/';
   final String baseUrlPerfil =
       'https://api-esetel.vercel.app/api/clientes/perfil/';
+  final String baseUrlSolicitudes =
+      'https://api-esetel.vercel.app/api/cliente/';
 
   /// Obtener el perfil del cliente autenticado (GET)
   Future<Cliente> obtenerPerfil() async {
@@ -36,6 +39,68 @@ class ApiService {
       throw Exception('Sesión expirada');
     } else {
       throw Exception('Error al obtener perfil: ${response.body}');
+    }
+  }
+
+  /// Obtener las solicitudes del cliente autenticado (GET)
+  Future<List<Solicitud>> obtenerSolicitudesCliente() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    // Primero obtenemos el perfil para obtener el ID del cliente
+    final cliente = await obtenerPerfil();
+
+    if (cliente.id == null) {
+      throw Exception('No se pudo obtener el ID del cliente');
+    }
+
+    final response = await http.get(
+      Uri.parse('${baseUrlSolicitudes}${cliente.id}/solicitudes/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Solicitud.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener solicitudes: ${response.body}');
+    }
+  }
+
+  /// Obtener el detalle de una solicitud específica (GET)
+  Future<Solicitud> obtenerSolicitudDetalle(int solicitudId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    final response = await http.get(
+      Uri.parse('https://api-esetel.vercel.app/api/solicitudes/$solicitudId/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return Solicitud.fromJson(data);
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception(
+          'Error al obtener detalle de solicitud: ${response.body}');
     }
   }
 
