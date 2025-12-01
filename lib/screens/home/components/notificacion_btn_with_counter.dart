@@ -22,16 +22,20 @@ class _NotificacionBtnWithCounterState
   @override
   void initState() {
     super.initState();
-    _cargarResumen();
+    _cargarNotificaciones();
   }
 
-  Future<void> _cargarResumen() async {
+  Future<void> _cargarNotificaciones() async {
     try {
-      final resumen = await ApiService().obtenerResumenNotificaciones();
+      // Usar el endpoint filtrado de mis-notificaciones
+      final notificaciones = await ApiService().obtenerMisNotificaciones();
       if (mounted) {
         setState(() {
-          _numOfItems = resumen.total;
-          _requiereAtencion = resumen.requiereAtencion;
+          _numOfItems = notificaciones.length;
+          // Verificar si hay notificaciones urgentes o de alta prioridad
+          _requiereAtencion = notificaciones.any(
+            (n) => n.esUrgente || n.esAlta,
+          );
         });
       }
     } catch (e) {
@@ -46,7 +50,7 @@ class _NotificacionBtnWithCounterState
       onTap: () {
         Navigator.pushNamed(context, NotificacionesScreen.routeName).then((_) {
           // Recargar el contador al volver de la pantalla de notificaciones
-          _cargarResumen();
+          _cargarNotificaciones();
         });
       },
       child: Stack(
