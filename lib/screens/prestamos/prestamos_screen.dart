@@ -55,7 +55,14 @@ class _PrestamosScreenState extends State<PrestamosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Mis Préstamos"),
+        title: const Text(
+          "Mis Préstamos",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(

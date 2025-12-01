@@ -5,6 +5,8 @@ import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:shop_app/screens/profile/profile_screen.dart';
 import 'package:shop_app/screens/solicitudes/solicitudes_screen.dart';
 import 'package:shop_app/screens/prestamos/prestamos_screen.dart';
+import 'package:shop_app/screens/notificaciones/notificaciones_screen.dart';
+import 'package:shop_app/services/api_service.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
 
@@ -19,22 +21,48 @@ class InitScreen extends StatefulWidget {
 
 class _InitScreenState extends State<InitScreen> {
   int currentSelectedIndex = 0;
+  int _notificationCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarContadorNotificaciones();
+  }
+
+  Future<void> _cargarContadorNotificaciones() async {
+    try {
+      final notificaciones = await ApiService().obtenerMisNotificaciones();
+      if (mounted) {
+        setState(() {
+          _notificationCount = notificaciones.length;
+        });
+      }
+    } catch (e) {
+      // Ignorar errores silenciosamente
+    }
+  }
 
   void updateCurrentIndex(int index) {
     setState(() {
       currentSelectedIndex = index;
     });
+    // Recargar contador al cambiar de tab
+    _cargarContadorNotificaciones();
   }
 
-  final pages = [
-    const HomeScreen(),
-    const SolicitudesScreen(),
-    const PrestamosScreen(),
-    const ProfileScreen()
-  ];
+  List<Widget> _buildPages() {
+    return [
+      HomeScreen(onNavigateToTab: updateCurrentIndex),
+      const SolicitudesScreen(),
+      const PrestamosScreen(),
+      const NotificacionesScreen(),
+      const ProfileScreen()
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    final pages = _buildPages();
     return Scaffold(
       body: pages[currentSelectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -94,6 +122,83 @@ class _InitScreenState extends State<InitScreen> {
               ),
             ),
             label: "Préstamos",
+          ),
+          BottomNavigationBarItem(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SvgPicture.asset(
+                  "assets/icons/Bell.svg",
+                  colorFilter: const ColorFilter.mode(
+                    inActiveIconColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                if (_notificationCount > 0)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 14,
+                        minHeight: 14,
+                      ),
+                      child: Text(
+                        _notificationCount > 9 ? '9+' : '$_notificationCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            activeIcon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SvgPicture.asset(
+                  "assets/icons/Bell.svg",
+                  colorFilter: const ColorFilter.mode(
+                    kPrimaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                if (_notificationCount > 0)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 14,
+                        minHeight: 14,
+                      ),
+                      child: Text(
+                        _notificationCount > 9 ? '9+' : '$_notificationCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            label: "Notificaciones",
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(

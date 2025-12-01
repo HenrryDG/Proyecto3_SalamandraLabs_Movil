@@ -4,6 +4,7 @@ import '../models/cliente.dart';
 import '../models/solicitud.dart';
 import '../models/prestamo.dart';
 import '../models/notificacion.dart';
+import '../models/dashboard_cliente.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
@@ -334,6 +335,46 @@ class ApiService {
       throw Exception('Sesión expirada');
     } else {
       throw Exception('Error al obtener resumen: ${response.body}');
+    }
+  }
+
+  // =========================================================================
+  // DASHBOARD CLIENTE
+  // =========================================================================
+
+  final String baseUrlDashboard = 'https://api-esetel.vercel.app/api/';
+
+  /// Obtener el dashboard completo del cliente autenticado (GET)
+  Future<DashboardCliente> obtenerDashboardCliente() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    // Primero obtenemos el perfil para obtener el ID del cliente
+    final cliente = await obtenerPerfil();
+
+    if (cliente.id == null) {
+      throw Exception('No se pudo obtener el ID del cliente');
+    }
+
+    final response = await http.get(
+      Uri.parse('${baseUrlDashboard}dashboard/cliente/${cliente.id}/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return DashboardCliente.fromJson(data);
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener dashboard: ${response.body}');
     }
   }
 }

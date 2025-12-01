@@ -28,7 +28,14 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Mi Cuenta"),
+        title: const Text(
+          "Mi Cuenta",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
       ),
       body: SafeArea(
         child: FutureBuilder<Cliente>(

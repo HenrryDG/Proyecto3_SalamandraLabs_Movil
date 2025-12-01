@@ -54,7 +54,14 @@ class _SolicitudesScreenState extends State<SolicitudesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Mis Solicitudes"),
+        title: const Text(
+          "Mis Solicitudes",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(

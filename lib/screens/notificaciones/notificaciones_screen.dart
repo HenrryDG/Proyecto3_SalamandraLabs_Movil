@@ -107,7 +107,14 @@ class _NotificacionesScreenState extends State<NotificacionesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notificaciones"),
+        title: const Text(
+          "Mis Notificaciones",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
       ),
       body: SafeArea(
         child: FutureBuilder<List<Notificacion>>(
@@ -273,7 +280,7 @@ class _NotificacionCard extends StatelessWidget {
                   child: Icon(
                     getEstiloIcon(notificacion.estilo),
                     color: color,
-                    size: 24,
+                    size: 15,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -282,30 +289,13 @@ class _NotificacionCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 4.0),
                       Text(
                         notificacion.titulo,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                          fontSize: 17,
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            getTipoIcon(notificacion.tipo),
-                            size: 14,
-                            color: kSecondaryColor,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            formatearFecha(notificacion.fechaGeneracion),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: kSecondaryColor,
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),

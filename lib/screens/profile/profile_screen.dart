@@ -45,7 +45,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Perfil"),
+        title: const Text(
+          "Perfil",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
       ),
       body: FutureBuilder<Cliente>(
         future: _clienteFuture,
@@ -86,12 +93,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.pushNamed(context, AccountInfoScreen.routeName);
                   },
                 ),
-                ProfileMenu(
+                /*ProfileMenu(
                   text: "Notificaciones",
                   icon: "assets/icons/Bell.svg",
                   press: () {},
                 ),
-                /*
+                
                 ProfileMenu(
                   text: "Configuración",
                   icon: "assets/icons/Settings.svg",
