@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../cart/cart_screen.dart';
 import 'icon_btn_with_counter.dart';
+import 'notificacion_btn_with_counter.dart';
 import 'search_field.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -23,11 +24,7 @@ class HomeHeader extends StatelessWidget {
             press: () => Navigator.pushNamed(context, CartScreen.routeName),
           ),
           const SizedBox(width: 8),
-          IconBtnWithCounter(
-            svgSrc: "assets/icons/Bell.svg",
-            numOfitem: 3,
-            press: () {},
-          ),
+          const NotificacionBtnWithCounter(),
         ],
       ),
     );
