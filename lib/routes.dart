@@ -21,6 +21,7 @@ import 'screens/solicitudes/solicitudes_screen.dart';
 import 'screens/solicitudes/solicitud_detalle_screen.dart';
 import 'screens/prestamos/prestamos_screen.dart';
 import 'screens/prestamos/plan_pagos_screen.dart';
+import 'screens/notificaciones/notificaciones_screen.dart';
 
 // We use name route
 // al final de tus imports
@@ -55,4 +56,6 @@ final Map<String, WidgetBuilder> routes = {
       const AuthGuard(child: PrestamosScreen()),
   PlanPagosScreen.routeName: (context) =>
       const AuthGuard(child: PlanPagosScreen()),
+  NotificacionesScreen.routeName: (context) =>
+      const AuthGuard(child: NotificacionesScreen()),
 };
