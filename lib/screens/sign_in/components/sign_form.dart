@@ -82,8 +82,8 @@ class _SignFormState extends State<SignForm> {
               if (value!.isEmpty) {
                 addError(error: kPassNullError);
                 return "";
-              } 
-              
+              }
+
               return null;
             },
             decoration: const InputDecoration(
@@ -115,8 +115,11 @@ class _SignFormState extends State<SignForm> {
                       setState(() => isLoading = false);
 
                       if (success) {
-                        Navigator.pushNamed(
-                            context, LoginSuccessScreen.routeName);
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          LoginSuccessScreen.routeName,
+                          (route) => false,
+                        );
                       } else {
                         addError(error: "Usuario o contraseña incorrectos");
                       }

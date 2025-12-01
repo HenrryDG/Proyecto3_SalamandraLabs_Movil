@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_app/constants.dart';
-import 'package:shop_app/screens/favorite/favorite_screen.dart';
 import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:shop_app/screens/profile/profile_screen.dart';
+import 'package:shop_app/screens/solicitudes/solicitudes_screen.dart';
+import 'package:shop_app/screens/prestamos/prestamos_screen.dart';
+import 'package:shop_app/screens/notificaciones/notificaciones_screen.dart';
+import 'package:shop_app/services/api_service.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
 
@@ -18,24 +21,48 @@ class InitScreen extends StatefulWidget {
 
 class _InitScreenState extends State<InitScreen> {
   int currentSelectedIndex = 0;
+  int _notificationCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarContadorNotificaciones();
+  }
+
+  Future<void> _cargarContadorNotificaciones() async {
+    try {
+      final notificaciones = await ApiService().obtenerMisNotificaciones();
+      if (mounted) {
+        setState(() {
+          _notificationCount = notificaciones.length;
+        });
+      }
+    } catch (e) {
+      // Ignorar errores silenciosamente
+    }
+  }
 
   void updateCurrentIndex(int index) {
     setState(() {
       currentSelectedIndex = index;
     });
+    // Recargar contador al cambiar de tab
+    _cargarContadorNotificaciones();
   }
 
-  final pages = [
-    const HomeScreen(),
-    const FavoriteScreen(),
-    const Center(
-      child: Text("Chat"),
-    ),
-    const ProfileScreen()
-  ];
+  List<Widget> _buildPages() {
+    return [
+      HomeScreen(onNavigateToTab: updateCurrentIndex),
+      const SolicitudesScreen(),
+      const PrestamosScreen(),
+      const NotificacionesScreen(),
+      const ProfileScreen()
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    final pages = _buildPages();
     return Scaffold(
       body: pages[currentSelectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -64,37 +91,114 @@ class _InitScreenState extends State<InitScreen> {
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
+              "assets/icons/receipt.svg",
               colorFilter: const ColorFilter.mode(
                 inActiveIconColor,
                 BlendMode.srcIn,
               ),
             ),
             activeIcon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
+              "assets/icons/receipt.svg",
               colorFilter: const ColorFilter.mode(
                 kPrimaryColor,
                 BlendMode.srcIn,
               ),
             ),
-            label: "Fav",
+            label: "Solicitudes",
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
+              "assets/icons/Cash.svg",
               colorFilter: const ColorFilter.mode(
                 inActiveIconColor,
                 BlendMode.srcIn,
               ),
             ),
             activeIcon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
+              "assets/icons/Cash.svg",
               colorFilter: const ColorFilter.mode(
                 kPrimaryColor,
                 BlendMode.srcIn,
               ),
             ),
-            label: "Chat",
+            label: "Préstamos",
+          ),
+          BottomNavigationBarItem(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SvgPicture.asset(
+                  "assets/icons/Bell.svg",
+                  colorFilter: const ColorFilter.mode(
+                    inActiveIconColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                if (_notificationCount > 0)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 14,
+                        minHeight: 14,
+                      ),
+                      child: Text(
+                        _notificationCount > 9 ? '9+' : '$_notificationCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            activeIcon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SvgPicture.asset(
+                  "assets/icons/Bell.svg",
+                  colorFilter: const ColorFilter.mode(
+                    kPrimaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                if (_notificationCount > 0)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 14,
+                        minHeight: 14,
+                      ),
+                      child: Text(
+                        _notificationCount > 9 ? '9+' : '$_notificationCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            label: "Notificaciones",
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
@@ -111,7 +215,7 @@ class _InitScreenState extends State<InitScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            label: "Fav",
+            label: "Perfil",
           ),
         ],
       ),
