@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/cliente.dart';
 import '../models/solicitud.dart';
 import '../models/prestamo.dart';
+import '../models/notificacion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
@@ -215,6 +216,124 @@ class ApiService {
       throw Exception('Sesión expirada');
     } else {
       throw Exception('Error al obtener plan de pagos: ${response.body}');
+    }
+  }
+
+  // =========================================================================
+  // NOTIFICACIONES
+  // =========================================================================
+
+  final String baseUrlNotificaciones =
+      'https://api-esetel.vercel.app/api/notificaciones/';
+
+  /// Obtener todas las notificaciones del cliente autenticado (GET)
+  Future<List<Notificacion>> obtenerMisNotificaciones() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    final response = await http.get(
+      Uri.parse('${baseUrlNotificaciones}mis-notificaciones/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> notificaciones = data['notificaciones'] ?? [];
+      return notificaciones.map((json) => Notificacion.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener notificaciones: ${response.body}');
+    }
+  }
+
+  /// Obtener alertas emergentes del cliente autenticado (GET)
+  Future<List<Notificacion>> obtenerMisAlertas() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    final response = await http.get(
+      Uri.parse('${baseUrlNotificaciones}mis-alertas/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> alertas = data['alertas'] ?? [];
+      return alertas.map((json) => Notificacion.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener alertas: ${response.body}');
+    }
+  }
+
+  /// Obtener historial de notificaciones del cliente autenticado (GET)
+  Future<List<Notificacion>> obtenerMiHistorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    final response = await http.get(
+      Uri.parse('${baseUrlNotificaciones}mi-historial/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> notificaciones = data['notificaciones'] ?? [];
+      return notificaciones.map((json) => Notificacion.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener historial: ${response.body}');
+    }
+  }
+
+  /// Obtener resumen de notificaciones del cliente autenticado (GET)
+  Future<ResumenNotificaciones> obtenerResumenNotificaciones() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString("access");
+
+    if (accessToken == null) {
+      throw Exception('No hay token de acceso');
+    }
+
+    final response = await http.get(
+      Uri.parse('${baseUrlNotificaciones}mi-resumen/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return ResumenNotificaciones.fromJson(data);
+    } else if (response.statusCode == 401) {
+      throw Exception('Sesión expirada');
+    } else {
+      throw Exception('Error al obtener resumen: ${response.body}');
     }
   }
 }
