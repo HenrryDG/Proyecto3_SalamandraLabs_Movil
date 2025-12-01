@@ -195,7 +195,7 @@ class ProximaCuotaCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: accentColor,
+              color: Colors.grey.shade700,
             ),
           ),
           const SizedBox(height: 12),
@@ -220,8 +220,6 @@ class ProximaCuotaCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.warning_amber, size: 16, color: Colors.red),
-                const SizedBox(width: 4),
                 Text(
                   'Mora: ${_formatearMonto(proximaCuota!.moraCuota)}',
                   style: TextStyle(
@@ -239,7 +237,7 @@ class ProximaCuotaCard extends StatelessWidget {
               '${proximaCuota!.diasParaVencer.abs()} días de atraso',
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.red,
+                color: Colors.grey.shade700,
                 fontWeight: FontWeight.w600,
               ),
             ),

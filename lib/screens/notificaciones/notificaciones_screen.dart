@@ -259,9 +259,6 @@ class _NotificacionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFF5F6F9),
           borderRadius: BorderRadius.circular(15),
-          border: esUrgente
-              ? Border.all(color: Colors.red.withOpacity(0.5), width: 2)
-              : Border.all(color: color.withOpacity(0.3), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,20 +267,7 @@ class _NotificacionCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Ícono del estilo
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    getEstiloIcon(notificacion.estilo),
-                    color: color,
-                    size: 15,
-                  ),
-                ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 // Título y tipo
                 Expanded(
                   child: Column(
@@ -294,7 +278,7 @@ class _NotificacionCard extends StatelessWidget {
                         notificacion.titulo,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 17,
+                          fontSize: 18,
                         ),
                       ),
                     ],
