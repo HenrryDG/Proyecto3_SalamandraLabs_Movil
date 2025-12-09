@@ -20,7 +20,7 @@ class LoginSuccessScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            "Login Success",
+            "¡Acceso Confirmado!",
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,

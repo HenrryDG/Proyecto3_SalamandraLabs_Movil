@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/notificacion.dart';
 import '../services/api_service.dart';
 import '../constants.dart';
@@ -10,19 +13,71 @@ class NotificacionService {
   factory NotificacionService() => _instance;
   NotificacionService._internal();
 
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
   Timer? _timer;
   final _resumenController =
       StreamController<ResumenNotificaciones>.broadcast();
   final _alertasController = StreamController<List<Notificacion>>.broadcast();
+  final _nuevasAlertasController = StreamController<void>.broadcast();
 
   Stream<ResumenNotificaciones> get resumenStream => _resumenController.stream;
   Stream<List<Notificacion>> get alertasStream => _alertasController.stream;
+  Stream<void> get nuevasAlertasStream => _nuevasAlertasController.stream;
 
   ResumenNotificaciones? _ultimoResumen;
   ResumenNotificaciones? get ultimoResumen => _ultimoResumen;
 
-  /// Inicia el polling de notificaciones (cada 60 segundos)
-  void iniciarPolling({Duration intervalo = const Duration(seconds: 60)}) {
+  /// Inicializa el servicio de notificaciones
+  Future<void> init() async {
+    // Configuración para Android
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    // Configuración para iOS
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await _localNotifications.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (response) {
+        // Manejar navegación al tocar la notificación
+        if (response.payload != null) {
+          if (response.payload!.startsWith('/plan-pagos:')) {
+            final idStr = response.payload!.split(':')[1];
+            final id = int.tryParse(idStr);
+            if (id != null) {
+              navigatorKey.currentState
+                  ?.pushNamed('/plan-pagos', arguments: id);
+            }
+          } else {
+            navigatorKey.currentState?.pushNamed(response.payload!);
+          }
+        }
+      },
+    );
+
+    // Solicitar permisos
+    await _solicitarPermisos();
+  }
+
+  Future<void> _solicitarPermisos() async {
+    // Android 13+
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+  }
+
+  /// Inicia el polling de notificaciones (cada 5 segundos)
+  void iniciarPolling({Duration intervalo = const Duration(seconds: 5)}) {
     _timer?.cancel();
 
     // Verificar inmediatamente
@@ -54,11 +109,74 @@ class NotificacionService {
       final alertas = await apiService.obtenerMisAlertas();
       if (alertas.isNotEmpty) {
         _alertasController.add(alertas);
+        await _procesarAlertasLocales(alertas);
       }
     } catch (e) {
       // Silenciar errores de polling para no interrumpir la app
       debugPrint('Error al verificar notificaciones: $e');
     }
+  }
+
+  /// Procesa las alertas y muestra notificaciones locales si son nuevas
+  Future<void> _procesarAlertasLocales(List<Notificacion> alertas) async {
+    final prefs = await SharedPreferences.getInstance();
+    final mostradas = prefs.getStringList('notificaciones_mostradas') ?? [];
+    final nuevasMostradas = List<String>.from(mostradas);
+    bool huboCambios = false;
+
+    for (final alerta in alertas) {
+      // Si no ha sido mostrada localmente
+      if (!mostradas.contains(alerta.id)) {
+        await _mostrarNotificacionLocal(alerta);
+        nuevasMostradas.add(alerta.id);
+        huboCambios = true;
+      }
+    }
+
+    // Limpiar IDs antiguos para no llenar la memoria (opcional, mantener últimos 100)
+    if (nuevasMostradas.length > 100) {
+      nuevasMostradas.removeRange(0, nuevasMostradas.length - 100);
+      huboCambios = true;
+    }
+
+    if (huboCambios) {
+      await prefs.setStringList('notificaciones_mostradas', nuevasMostradas);
+      _nuevasAlertasController.add(null);
+    }
+  }
+
+  Future<void> _mostrarNotificacionLocal(Notificacion notificacion) async {
+    const androidDetails = AndroidNotificationDetails(
+      'channel_pagos',
+      'Pagos y Alertas',
+      channelDescription: 'Notificaciones de pagos y alertas importantes',
+      importance: Importance.high,
+      priority: Priority.high,
+      color: kPrimaryColor,
+    );
+
+    const iosDetails = DarwinNotificationDetails();
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    // Usar hash del ID string para tener un int único
+    final idInt = notificacion.id.hashCode;
+
+    String payload = '/notificaciones';
+    if (notificacion.prestamoId != null) {
+      payload = '/plan-pagos:${notificacion.prestamoId}';
+    }
+
+    await _localNotifications.show(
+      idInt,
+      notificacion.titulo,
+      notificacion.mensaje,
+      details,
+      payload: payload, // Ruta a navegar
+    );
   }
 
   /// Fuerza una actualización inmediata
@@ -71,6 +189,7 @@ class NotificacionService {
     _timer?.cancel();
     _resumenController.close();
     _alertasController.close();
+    _nuevasAlertasController.close();
   }
 }
 

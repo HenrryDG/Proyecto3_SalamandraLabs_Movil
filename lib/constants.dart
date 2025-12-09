@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 const kPrimaryColor = Color(0xFF44CFED);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFF23B3E8), Color(0xFF44CFED),],
+  colors: [
+    Color(0xFF23B3E8),
+    Color(0xFF44CFED),
+  ],
 );
 const kSecondaryColor = Color(0xFF979797);
 const kTextColor = Colors.black;
@@ -28,7 +32,8 @@ final RegExp emailValidatorRegExp =
     RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
 const String kEmailNullError = "Por favor ingrese su correo electrónico";
-const String kInvalidEmailError = "Por favor ingrese un correo electrónico válido";
+const String kInvalidEmailError =
+    "Por favor ingrese un correo electrónico válido";
 const String kUserNameNullError = "Por favor ingrese su nombre de usuario";
 const String kPassNullError = "Por favor ingrese su contraseña";
 const String kShortPassError = "La contraseña es muy corta";
