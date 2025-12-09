@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../models/cliente.dart';
 import '../../models/dashboard_cliente.dart';
 import '../../services/api_service.dart';
+import '../../services/notificacion_service.dart';
 import 'components/dashboard_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,11 +20,30 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Map<String, dynamic>> _dataFuture;
+  StreamSubscription? _notifSubscription;
 
   @override
   void initState() {
     super.initState();
     _dataFuture = _cargarDatos();
+
+    // Escuchar nuevas notificaciones para actualizar dashboard
+    _notifSubscription = NotificacionService().nuevasAlertasStream.listen((_) {
+      _recargarDatosSilenciosamente();
+    });
+  }
+
+  @override
+  void dispose() {
+    _notifSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _recargarDatosSilenciosamente() async {
+    if (!mounted) return;
+    setState(() {
+      _dataFuture = _cargarDatos();
+    });
   }
 
   Future<Map<String, dynamic>> _cargarDatos() async {
