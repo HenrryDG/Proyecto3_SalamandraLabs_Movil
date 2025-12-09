@@ -16,15 +16,23 @@ class PlanPagosScreen extends StatefulWidget {
 
 class _PlanPagosScreenState extends State<PlanPagosScreen> {
   late Future<List<PlanPago>> _planPagosFuture;
-  Prestamo? _prestamo;
+  int? _prestamoId;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final prestamo = ModalRoute.of(context)?.settings.arguments as Prestamo?;
-    if (prestamo != null && _prestamo == null) {
-      _prestamo = prestamo;
-      _planPagosFuture = ApiService().obtenerPlanPagos(prestamo.id);
+    final args = ModalRoute.of(context)?.settings.arguments;
+
+    if (_prestamoId == null) {
+      if (args is Prestamo) {
+        _prestamoId = args.id;
+      } else if (args is int) {
+        _prestamoId = args;
+      }
+
+      if (_prestamoId != null) {
+        _planPagosFuture = ApiService().obtenerPlanPagos(_prestamoId!);
+      }
     }
   }
 
@@ -72,7 +80,7 @@ class _PlanPagosScreenState extends State<PlanPagosScreen> {
         title: const Text("Plan de Pagos"),
       ),
       body: SafeArea(
-        child: _prestamo == null
+        child: _prestamoId == null
             ? const Center(child: Text("No se encontró el préstamo"))
             : FutureBuilder<List<PlanPago>>(
                 future: _planPagosFuture,
@@ -114,7 +122,7 @@ class _PlanPagosScreenState extends State<PlanPagosScreen> {
                               onPressed: () {
                                 setState(() {
                                   _planPagosFuture = ApiService()
-                                      .obtenerPlanPagos(_prestamo!.id);
+                                      .obtenerPlanPagos(_prestamoId!);
                                 });
                               },
                               child: const Text("Reintentar"),
@@ -161,7 +169,7 @@ class _PlanPagosScreenState extends State<PlanPagosScreen> {
                     onRefresh: () async {
                       setState(() {
                         _planPagosFuture =
-                            ApiService().obtenerPlanPagos(_prestamo!.id);
+                            ApiService().obtenerPlanPagos(_prestamoId!);
                       });
                     },
                     child: ListView.builder(
