@@ -20,6 +20,12 @@ class _SplashContentState extends State<SplashContent> {
     return Column(
       children: <Widget>[
         const Spacer(),
+        Image.asset(
+          "assets/icons/logo.png",
+          height: 80,
+          width: 80,
+        ),
+        const SizedBox(height: 10),
         const Text(
           "ESETEL",
           style: TextStyle(

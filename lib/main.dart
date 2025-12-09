@@ -83,7 +83,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      title: 'The Flutter Way - Template',
+      title: 'ESETEL',
       theme: AppTheme.lightTheme(context),
       initialRoute: AuthWrapper.routeName,
       routes: routes,
