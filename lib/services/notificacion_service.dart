@@ -19,9 +19,11 @@ class NotificacionService {
   final _resumenController =
       StreamController<ResumenNotificaciones>.broadcast();
   final _alertasController = StreamController<List<Notificacion>>.broadcast();
+  final _nuevasAlertasController = StreamController<void>.broadcast();
 
   Stream<ResumenNotificaciones> get resumenStream => _resumenController.stream;
   Stream<List<Notificacion>> get alertasStream => _alertasController.stream;
+  Stream<void> get nuevasAlertasStream => _nuevasAlertasController.stream;
 
   ResumenNotificaciones? _ultimoResumen;
   ResumenNotificaciones? get ultimoResumen => _ultimoResumen;
@@ -74,8 +76,8 @@ class NotificacionService {
     }
   }
 
-  /// Inicia el polling de notificaciones (cada 60 segundos)
-  void iniciarPolling({Duration intervalo = const Duration(seconds: 60)}) {
+  /// Inicia el polling de notificaciones (cada 15 segundos)
+  void iniciarPolling({Duration intervalo = const Duration(seconds: 15)}) {
     _timer?.cancel();
 
     // Verificar inmediatamente
@@ -139,6 +141,7 @@ class NotificacionService {
 
     if (huboCambios) {
       await prefs.setStringList('notificaciones_mostradas', nuevasMostradas);
+      _nuevasAlertasController.add(null);
     }
   }
 
@@ -186,6 +189,7 @@ class NotificacionService {
     _timer?.cancel();
     _resumenController.close();
     _alertasController.close();
+    _nuevasAlertasController.close();
   }
 }
 
