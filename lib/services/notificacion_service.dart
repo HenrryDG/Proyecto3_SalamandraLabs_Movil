@@ -76,8 +76,8 @@ class NotificacionService {
     }
   }
 
-  /// Inicia el polling de notificaciones (cada 15 segundos)
-  void iniciarPolling({Duration intervalo = const Duration(seconds: 15)}) {
+  /// Inicia el polling de notificaciones (cada 5 segundos)
+  void iniciarPolling({Duration intervalo = const Duration(seconds: 5)}) {
     _timer?.cancel();
 
     // Verificar inmediatamente
